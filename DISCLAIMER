@@ -1,0 +1,81 @@
+# 免责声明 / Disclaimer
+
+## 中文版
+
+本项目（Python 数据挖掘学习路径 / python-data-mining）仅供学习和研究目的使用。使用本项目时，请遵守以下条款：
+
+### 1. 目的限制
+
+- 本项目所有代码、文档和示例数据仅用于教学和学习目的，**不构成任何专业建议**。
+- 本项目中的算法实现旨在演示原理，**未经生产环境验证，不建议直接用于商业或生产场景**。
+
+### 2. 数据与隐私
+
+- 本项目中使用的数据集均为公开数据集或合成数据，**不包含任何真实个人隐私数据**。
+- 如果您将本项目的方法应用于真实数据，请确保遵守当地数据保护法律法规（如 GDPR、《个人信息保护法》等）。
+
+### 3. 准确性
+
+- 本项目力求内容和算法实现的准确性，但**不保证完全无误**。
+- 部分算法的手动实现为教学简化版本，可能存在精度、性能或边界条件处理的局限，与生产级库（如 scikit-learn）的实现可能存在差异。
+
+### 4. 第三方依赖
+
+- 本项目依赖 numpy、pandas、scikit-learn、tensorflow 等第三方开源库，这些库的使用受各自开源协议约束。
+- 本项目不对第三方库的安全性、稳定性做任何担保。
+
+### 5. 知识产权
+
+- 本项目代码采用 [MIT License](./LICENSE) 开源协议发布。
+- 项目中引用的教材内容、算法原理属于原作者和出版方，本项目仅作教学引用。
+
+### 6. 免责
+
+- 使用本项目所产生的一切后果由使用者自行承担。
+- 项目作者和贡献者**不对因使用本项目造成的任何直接或间接损失负责**，包括但不限于数据丢失、业务中断、利润损失等。
+
+### 7. 合规提醒
+
+- 请勿将本项目中的技术用于任何非法目的。
+- 在应用数据挖掘技术时，请遵守所在行业的法律法规和伦理规范。
+
+---
+
+## English Version
+
+This project (Python Data Mining Learning Path / python-data-mining) is intended for educational and research purposes only. By using this project, you agree to the following terms:
+
+### 1. Purpose Limitation
+
+- All code, documentation, and sample data in this project are for educational and learning purposes only and **do not constitute professional advice**.
+- Algorithm implementations in this project are intended to demonstrate principles and **have not been validated for production environments. They are not recommended for direct use in commercial or production scenarios**.
+
+### 2. Data & Privacy
+
+- The datasets used in this project are all publicly available or synthetic data. **No real personal privacy data is included**.
+- If you apply the methods in this project to real data, please ensure compliance with local data protection laws and regulations (e.g., GDPR, PIPL, etc.).
+
+### 3. Accuracy
+
+- While we strive for accuracy, **we do not guarantee that the content and algorithm implementations are completely error-free**.
+- Some hand-crafted algorithm implementations are simplified for teaching purposes and may have limitations in precision, performance, or edge case handling, potentially differing from production-grade libraries (e.g., scikit-learn).
+
+### 4. Third-Party Dependencies
+
+- This project depends on third-party open-source libraries such as numpy, pandas, scikit-learn, tensorflow, etc., which are governed by their respective open-source licenses.
+- We make no warranties regarding the security or stability of third-party libraries.
+
+### 5. Intellectual Property
+
+- The project code is released under the [MIT License](./LICENSE).
+- Textbook content and algorithm principles referenced in this project belong to their original authors and publishers. This project cites them for educational purposes only.
+
+### 6. Liability Disclaimer
+
+- Users assume all consequences arising from the use of this project.
+- The project authors and contributors **shall not be liable for any direct or indirect damages caused by the use of this project**, including but not limited to data loss, business interruption, loss of profits, etc.
+
+### 7. Compliance Reminder
+
+- Do not use the techniques in this project for any illegal purposes.
+- When applying data mining techniques, please comply with the laws, regulations, and ethical standards of your industry.
