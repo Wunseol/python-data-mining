@@ -9,6 +9,7 @@
 5. 集成方法对比
 """
 
+import os
 import numpy as np
 import matplotlib.pyplot as plt
 from sklearn.datasets import make_classification, load_breast_cancer
@@ -27,6 +28,8 @@ from sklearn.preprocessing import StandardScaler
 
 plt.rcParams['font.sans-serif'] = ['SimHei', 'Microsoft YaHei']
 plt.rcParams['axes.unicode_minus'] = False
+
+_SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 
 
 # ============================================================
@@ -53,7 +56,7 @@ def demo_random_forest(X_train, X_test, y_train, y_test, feature_names=None):
     plt.xticks(range(n_features), names, rotation=45, ha='right')
     plt.title('随机森林特征重要性 Top-15')
     plt.tight_layout()
-    plt.savefig('随机森林特征重要性.png', dpi=150, bbox_inches='tight')
+    plt.savefig(os.path.join(_SCRIPT_DIR, '随机森林特征重要性.png'), dpi=150, bbox_inches='tight')
     plt.show()
 
     return rf
@@ -91,7 +94,7 @@ def demo_adaboost(X_train, X_test, y_train, y_test):
     plt.ylabel('准确率')
     plt.title('AdaBoost学习曲线')
     plt.legend()
-    plt.savefig('AdaBoost学习曲线.png', dpi=150, bbox_inches='tight')
+    plt.savefig(os.path.join(_SCRIPT_DIR, 'AdaBoost学习曲线.png'), dpi=150, bbox_inches='tight')
     plt.show()
 
     return ada
@@ -119,7 +122,7 @@ def demo_gbdt(X_train, X_test, y_train, y_test):
     plt.ylabel('训练损失 (Deviance)')
     plt.title('GBDT训练过程')
     plt.legend()
-    plt.savefig('GBDT训练过程.png', dpi=150, bbox_inches='tight')
+    plt.savefig(os.path.join(_SCRIPT_DIR, 'GBDT训练过程.png'), dpi=150, bbox_inches='tight')
     plt.show()
 
     return gbdt

@@ -36,17 +36,6 @@ Thumbs.db
 Desktop.ini
 ehthumbs.db
 
-# ---- 大文件（超过 GitHub 限制） ----
-# GitHub 单文件限制 100MB，建议超过 25MB 的文件不提交
-*.h5
-*.hdf5
-*.pkl
-*.joblib
-*.zip
-
-# 具体的大文件
-07_无监督学习/02_关联规则挖掘/02_FPGrowth算法/kosarak.dat
-
 # ---- 日志 ----
 *.log
 
@@ -69,3 +58,16 @@ coverage.xml
 
 # ---- CodeBuddy ----
 .codebuddy/
+
+# ---- 数据文件（压缩版跟踪，未压缩版忽略）----
+04_分类算法/01_K近邻算法/digits/
+04_分类算法/02_朴素贝叶斯/email/
+04_分类算法/04_支持向量机/trainingDigits/
+04_分类算法/04_支持向量机/testDigits/
+07_无监督学习/02_关联规则挖掘/01_Apriori算法/mushroom.dat
+07_无监督学习/02_关联规则挖掘/02_FPGrowth算法/kosarak.dat
+07_无监督学习/03_降维与矩阵分解/01_PCA主成分分析/secom.data
+08_深度学习/02_文本分类模型对比/data/
+
+# ---- 外部参考代码 ----
+machinelearninginaction-master/

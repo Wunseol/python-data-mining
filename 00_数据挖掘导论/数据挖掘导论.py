@@ -9,11 +9,19 @@
 5. 数据挖掘应用场景
 """
 
+from __future__ import annotations
+
+import sys
+import os
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
+from utils import setup_chinese_font
+
 import numpy as np
+from numpy.typing import NDArray
+from collections.abc import Iterable
 import matplotlib.pyplot as plt
 
-plt.rcParams['font.sans-serif'] = ['SimHei', 'Microsoft YaHei']
-plt.rcParams['axes.unicode_minus'] = False
+setup_chinese_font()
 
 
 # ============================================================
@@ -117,29 +125,37 @@ def data_types_overview():
 # ============================================================
 # 4. 相似度与距离度量
 # ============================================================
-def euclidean_distance(x, y):
+def euclidean_distance(x: NDArray, y: NDArray) -> float:
     """欧氏距离 — 最常用的距离度量"""
+    if x.shape != y.shape:
+        raise ValueError(f"输入向量维度不一致: x 的维度为 {x.shape}, y 的维度为 {y.shape}")
     return np.sqrt(np.sum((x - y) ** 2))
 
 
-def manhattan_distance(x, y):
+def manhattan_distance(x: NDArray, y: NDArray) -> float:
     """曼哈顿距离 (L1范数)"""
+    if x.shape != y.shape:
+        raise ValueError(f"输入向量维度不一致: x 的维度为 {x.shape}, y 的维度为 {y.shape}")
     return np.sum(np.abs(x - y))
 
 
-def minkowski_distance(x, y, p=2):
+def minkowski_distance(x: NDArray, y: NDArray, p: float = 2) -> float:
     """闵可夫斯基距离 — 欧氏和曼哈顿的推广"""
+    if x.shape != y.shape:
+        raise ValueError(f"输入向量维度不一致: x 的维度为 {x.shape}, y 的维度为 {y.shape}")
     return np.power(np.sum(np.abs(x - y) ** p), 1 / p)
 
 
-def cosine_similarity(x, y):
+def cosine_similarity(x: NDArray, y: NDArray) -> float:
     """余弦相似度 — 衡量方向相似性，常用于文本和推荐系统"""
+    if x.shape != y.shape:
+        raise ValueError(f"输入向量维度不一致: x 的维度为 {x.shape}, y 的维度为 {y.shape}")
     dot = np.dot(x, y)
     norm = np.linalg.norm(x) * np.linalg.norm(y)
     return dot / norm if norm != 0 else 0
 
 
-def jaccard_similarity(A, B):
+def jaccard_similarity(A: Iterable, B: Iterable) -> float:
     """Jaccard相似度 — 用于集合比较，常用于推荐和文本"""
     A, B = set(A), set(B)
     intersection = len(A & B)
@@ -147,8 +163,12 @@ def jaccard_similarity(A, B):
     return intersection / union if union != 0 else 0
 
 
-def pearson_correlation(x, y):
+def pearson_correlation(x: NDArray, y: NDArray) -> float:
     """Pearson相关系数 — 衡量线性相关程度"""
+    if x.shape != y.shape:
+        raise ValueError(f"输入向量长度不一致: x 的长度为 {len(x)}, y 的长度为 {len(y)}")
+    if len(x) < 2:
+        raise ValueError(f"输入向量长度必须大于等于2，当前长度为 {len(x)}")
     n = len(x)
     mean_x, mean_y = np.mean(x), np.mean(y)
     cov = np.sum((x - mean_x) * (y - mean_y)) / (n - 1)

@@ -233,6 +233,7 @@ def loadImages(dirName):
         trainingMat[i,:] = img2vector('%s/%s' % (dirName, fileNameStr))
     return trainingMat, hwLabels    
 
+# ====基于外部文件的手写数字识别（依赖 trainingDigits/testDigits 目录），推荐使用 testDigitsSklearn() ====
 def testDigits(kTup=('rbf', 10)):
     dataArr,labelArr = loadImages(os.path.join(_SCRIPT_DIR, 'trainingDigits'))
     b,alphas = smoP(dataArr, labelArr, 200, 0.0001, 10000, kTup)
@@ -257,6 +258,81 @@ def testDigits(kTup=('rbf', 10)):
         predict=kernelEval.T * multiply(labelSV,alphas[svInd]) + b
         if sign(predict)!=sign(labelArr[i]): errorCount += 1    
     print ("the test error rate is: %f" % (float(errorCount)/m) )
+
+# ====基于 sklearn 内置数据集的手写数字识别（自包含，无外部文件依赖）====
+def testDigitsSklearn(kTup=('rbf', 10)):
+    """
+    使用 sklearn.datasets.load_digits 加载 8x8 手写数字数据，
+    构造二分类任务（数字9 → -1，其他数字 → 1），
+    复用 smoP / kernelTrans 等核心 SVM 函数完成训练与预测。
+    """
+    from sklearn.datasets import load_digits
+    random.seed(42)
+
+    # ----加载 sklearn 内置的 8x8 手写数字数据集----
+    digits = load_digits()
+    # digits.data: (1797, 64) 每行是一个 8x8 图像展平后的 64 维向量
+    # digits.target: (1797,) 每个样本的数字标签 0-9
+    data_all = digits.data.astype(float)
+    target_all = digits.target
+
+    # ----构造二分类标签：数字9 → -1，其他数字 → 1----
+    # 与原 testDigits() 逻辑一致：9 为负类，其余为正类
+    label_all = []
+    for t in target_all:
+        if t == 9:
+            label_all.append(-1.0)
+        else:
+            label_all.append(1.0)
+
+    # ----划分训练集和测试集（固定随机种子保证可复现）----
+    m = len(label_all)
+    indices = list(range(m))
+    random.shuffle(indices)
+    train_count = int(m * 0.7)
+
+    train_indices = indices[:train_count]
+    test_indices = indices[train_count:]
+
+    train_data = data_all[train_indices]
+    train_labels = [label_all[i] for i in train_indices]
+    test_data = data_all[test_indices]
+    test_labels = [label_all[i] for i in test_indices]
+
+    # ----使用完整 Platt SMO 算法训练 SVM----
+    # C=200：惩罚参数，与原 testDigits 一致
+    # toler=0.0001：KKT 条件容忍度
+    # maxIter=10000：最大迭代次数
+    b, alphas = smoP(train_data, train_labels, 200, 0.0001, 10000, kTup)
+
+    # ----提取支持向量----
+    datMat = mat(train_data)
+    labelMat = mat(train_labels).transpose()
+    svInd = nonzero(alphas.A > 0)[0]
+    sVs = datMat[svInd]
+    labelSV = labelMat[svInd]
+    print("there are %d Support Vectors" % shape(sVs)[0])
+
+    # ----计算训练错误率----
+    m_train = shape(datMat)[0]
+    errorCount = 0
+    for i in range(m_train):
+        kernelEval = kernelTrans(sVs, datMat[i, :], kTup)
+        predict = kernelEval.T * multiply(labelSV, alphas[svInd]) + b
+        if sign(predict) != sign(train_labels[i]):
+            errorCount += 1
+    print("the training error rate is: %f" % (float(errorCount) / m_train))
+
+    # ----计算测试错误率----
+    testMat = mat(test_data)
+    m_test = shape(testMat)[0]
+    errorCount = 0
+    for i in range(m_test):
+        kernelEval = kernelTrans(sVs, testMat[i, :], kTup)
+        predict = kernelEval.T * multiply(labelSV, alphas[svInd]) + b
+        if sign(predict) != sign(test_labels[i]):
+            errorCount += 1
+    print("the test error rate is: %f" % (float(errorCount) / m_test))
 
 
 '''#######********************************

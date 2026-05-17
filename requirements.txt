@@ -22,7 +22,7 @@ jieba>=0.42
 networkx>=2.6
 
 # ---- 开发工具 [可选] ----
-# pytest>=7.0          # 单元测试
-# coverage>=6.0        # 代码覆盖率
-# flake8>=4.0          # 代码风格检查
-# mypy>=0.950          # 类型检查
+pytest>=7.0
+coverage>=6.0
+flake8>=4.0
+mypy>=0.950

@@ -1,0 +1,9 @@
+- [x] KNN digits 目录已压缩为 digits.zip，原始目录已删除
+- [x] 朴素贝叶斯 email 目录已压缩为 email.zip，原始目录已删除
+- [x] SVM trainingDigits + testDigits 已压缩为 digits.zip，原始目录已删除
+- [x] 用户已被告知需手动处理的大文件（kosarak.dat、secom.data、mushroom.dat）
+- [x] docs/数据文件说明.md 已更新，包含完整数据文件清单
+- [x] 文档中包含压缩包使用方法（解压命令和目标目录）
+- [x] 文档中包含缺失文件说明（bikeSpeedVsIq_train.txt 等）
+- [x] 文档中包含已内嵌数据的替代方案说明
+- [x] 文档中不再要求安装 Git LFS
