@@ -8,15 +8,19 @@ K-Means聚类模块 - K-Means Clustering
 4. 聚类可视化
 """
 
+import sys
+import os
+
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', '..'))
 import numpy as np
 import matplotlib.pyplot as plt
 from sklearn.datasets import make_blobs, load_iris
 from sklearn.cluster import KMeans, MiniBatchKMeans
 from sklearn.metrics import silhouette_score, calinski_harabasz_score
 from sklearn.preprocessing import StandardScaler
+from utils import setup_chinese_font
 
-plt.rcParams['font.sans-serif'] = ['SimHei', 'Microsoft YaHei']
-plt.rcParams['axes.unicode_minus'] = False
+setup_chinese_font()
 
 
 # ============================================================

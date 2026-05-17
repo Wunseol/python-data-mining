@@ -9,7 +9,12 @@
 5. 模型对比
 """
 
+import sys
+import os
+
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), '..'))
 import numpy as np
+import pandas as pd
 import matplotlib.pyplot as plt
 from sklearn.datasets import load_breast_cancer, make_classification
 from sklearn.model_selection import (
@@ -28,9 +33,9 @@ from sklearn.metrics import (
     roc_curve, auc, roc_auc_score,
     mean_squared_error, mean_absolute_error, r2_score
 )
+from utils import setup_chinese_font
 
-plt.rcParams['font.sans-serif'] = ['SimHei', 'Microsoft YaHei']
-plt.rcParams['axes.unicode_minus'] = False
+setup_chinese_font()
 
 
 # ============================================================

@@ -1,6 +1,6 @@
-from numpy import *
+import numpy as np
 
-from tkinter import * 
+from tkinter import Tk, Label, Entry, Button, IntVar, Checkbutton, END
 import regTrees
 
 import matplotlib
@@ -22,7 +22,7 @@ def reDraw(tolS,tolN):
         yHat = regTrees.createForeCast(myTree, reDraw.testDat)
     reDraw.a.scatter(reDraw.rawDat[:,0], reDraw.rawDat[:,1], s=5) #use scatter for data set
     reDraw.a.plot(reDraw.testDat, yHat, linewidth=2.0) #use plot for yHat
-    reDraw.canvas.show()
+    reDraw.canvas.draw()
     
 def getInputs():
     try: tolN = int(tolNentry.get())
@@ -47,7 +47,7 @@ root=Tk()
 
 reDraw.f = Figure(figsize=(5,4), dpi=100) #create canvas
 reDraw.canvas = FigureCanvasTkAgg(reDraw.f, master=root)
-reDraw.canvas.show()
+reDraw.canvas.draw()
 reDraw.canvas.get_tk_widget().grid(row=0, columnspan=3)
 
 Label(root, text="tolN").grid(row=1, column=0)
@@ -63,8 +63,8 @@ chkBtnVar = IntVar()
 chkBtn = Checkbutton(root, text="Model Tree", variable = chkBtnVar)
 chkBtn.grid(row=3, column=0, columnspan=2)
 
-reDraw.rawDat = mat(regTrees.loadDataSet('sine.txt'))
-reDraw.testDat = arange(min(reDraw.rawDat[:,0]),max(reDraw.rawDat[:,0]),0.01)
+reDraw.rawDat = np.mat(regTrees.loadDataSet('sine.txt'))
+reDraw.testDat = np.arange(np.min(reDraw.rawDat[:,0]),np.max(reDraw.rawDat[:,0]),0.01)
 reDraw(1.0, 10)
                
 root.mainloop()

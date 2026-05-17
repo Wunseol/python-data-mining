@@ -5,7 +5,7 @@ Created on Mon Aug  6 20:28:06 2018
 
 @author: wzy
 """
-import FP_Growth
+import FP_Growth算法 as FP_Growth
 
 # 导入数据
 parsedDat = [line.split() for line in open(os.path.join(os.path.dirname(os.path.abspath(__file__)), 'kosarak.dat')).readlines()]

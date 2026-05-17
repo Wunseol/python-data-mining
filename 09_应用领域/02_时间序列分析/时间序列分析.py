@@ -9,13 +9,17 @@
 5. 趋势与季节性分析
 """
 
+import sys
+import os
+
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', '..'))
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 from datetime import datetime, timedelta
+from utils import setup_chinese_font
 
-plt.rcParams['font.sans-serif'] = ['SimHei', 'Microsoft YaHei']
-plt.rcParams['axes.unicode_minus'] = False
+setup_chinese_font()
 
 
 # ============================================================

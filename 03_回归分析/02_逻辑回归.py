@@ -8,6 +8,10 @@
 4. 评估指标与ROC曲线
 """
 
+import sys
+import os
+
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), '..'))
 import numpy as np
 import matplotlib.pyplot as plt
 from sklearn.datasets import make_classification, load_iris, load_breast_cancer
@@ -19,9 +23,9 @@ from sklearn.metrics import (
     roc_curve, auc, roc_auc_score
 )
 from sklearn.preprocessing import StandardScaler, label_binarize
+from utils import setup_chinese_font
 
-plt.rcParams['font.sans-serif'] = ['SimHei', 'Microsoft YaHei']
-plt.rcParams['axes.unicode_minus'] = False
+setup_chinese_font()
 
 
 # ============================================================

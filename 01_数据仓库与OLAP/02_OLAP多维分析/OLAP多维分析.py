@@ -11,13 +11,17 @@ OLAP多维分析模块 - OLAP Multidimensional Analysis
 参考：Han & Kamber《数据挖掘：概念与技术》第4-5章
 """
 
+import sys
+import os
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', '..'))
+from utils import setup_chinese_font
+
 import pandas as pd
 import numpy as np
 from itertools import product
 
 import matplotlib.pyplot as plt
-plt.rcParams['font.sans-serif'] = ['SimHei', 'Microsoft YaHei']
-plt.rcParams['axes.unicode_minus'] = False
+setup_chinese_font()
 
 
 # ============================================================
@@ -242,6 +246,71 @@ def demonstrate_attribute_oriented_induction():
                   f"(支持度={support:.1%})")
 
 
+def visualize_olap_operations(sales_data):
+    fig, axes = plt.subplots(2, 2, figsize=(14, 10))
+
+    ax1 = axes[0, 0]
+    slice_2023 = sales_data[sales_data['年份'] == 2023].groupby('地区')['销售额'].sum()
+    slice_2024 = sales_data[sales_data['年份'] == 2024].groupby('地区')['销售额'].sum()
+    x = np.arange(len(slice_2023.index))
+    width = 0.35
+    ax1.bar(x - width / 2, slice_2023.values, width, label='2023', color='#3498db', alpha=0.85)
+    ax1.bar(x + width / 2, slice_2024.values, width, label='2024', color='#e74c3c', alpha=0.85)
+    ax1.set_xlabel('地区')
+    ax1.set_ylabel('销售额')
+    ax1.set_title('切片：按年份选择（2023 vs 2024）')
+    ax1.set_xticks(x)
+    ax1.set_xticklabels(slice_2023.index)
+    ax1.legend()
+    ax1.grid(True, alpha=0.3, axis='y')
+
+    ax2 = axes[0, 1]
+    dice_result = sales_data[
+        (sales_data['年份'] == 2024) & (sales_data['地区'] == '北京')
+    ]
+    full_2024_beijing = sales_data[
+        (sales_data['年份'] == 2024) & (sales_data['地区'] == '北京')
+    ]
+    categories = full_2024_beijing['产品'].tolist()
+    values = full_2024_beijing['销售额'].tolist()
+    colors_dice = ['#2ecc71', '#f39c12']
+    bars = ax2.bar(categories, values, color=colors_dice, alpha=0.85, edgecolor='k')
+    for bar, val in zip(bars, values):
+        ax2.text(bar.get_x() + bar.get_width() / 2, bar.get_height() + 2, str(val), ha='center', fontsize=11)
+    ax2.set_xlabel('产品')
+    ax2.set_ylabel('销售额')
+    ax2.set_title('切块：2024年北京（多维选择子集）')
+    ax2.grid(True, alpha=0.3, axis='y')
+
+    ax3 = axes[1, 0]
+    by_quarter = sales_data.groupby('季度')['销售额'].sum()
+    by_year = sales_data.groupby('年份')['销售额'].sum()
+    ax3.bar(['Q1', 'Q2'], by_quarter.values, color='#9b59b6', alpha=0.85, label='按季度（下钻）')
+    ax3_twin = ax3.twinx()
+    ax3_twin.bar(['2023', '2024'], by_year.values, width=0.4, color='#1abc9c', alpha=0.6, label='按年份（上卷）')
+    ax3.set_xlabel('维度层次')
+    ax3.set_ylabel('季度销售额')
+    ax3_twin.set_ylabel('年度销售额')
+    ax3.set_title('上卷/下钻：时间维度层次聚合对比')
+    lines1, labels1 = ax3.get_legend_handles_labels()
+    lines2, labels2 = ax3_twin.get_legend_handles_labels()
+    ax3.legend(lines1 + lines2, labels1 + labels2, loc='upper left')
+    ax3.grid(True, alpha=0.3, axis='y')
+
+    ax4 = axes[1, 1]
+    pivot_result = sales_data.pivot_table(values='销售额', index='年份', columns='地区', aggfunc='sum')
+    pivot_result.plot(kind='bar', ax=ax4, color=['#3498db', '#e74c3c'], alpha=0.85, edgecolor='k')
+    ax4.set_xlabel('年份')
+    ax4.set_ylabel('销售额')
+    ax4.set_title('旋转：维度方向重排（年份×地区）')
+    ax4.legend(title='地区')
+    ax4.grid(True, alpha=0.3, axis='y')
+    ax4.set_xticklabels(ax4.get_xticklabels(), rotation=0)
+
+    plt.tight_layout()
+    plt.show()
+
+
 # ============================================================
 # 主程序
 # ============================================================
@@ -255,3 +324,4 @@ if __name__ == "__main__":
     demonstrate_olap_architectures()
     demonstrate_precomputation_strategies()
     demonstrate_attribute_oriented_induction()
+    visualize_olap_operations(sales_data)

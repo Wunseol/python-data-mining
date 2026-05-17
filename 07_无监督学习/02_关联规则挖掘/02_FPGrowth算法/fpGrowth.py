@@ -1,15 +1,16 @@
-'''
-Created on Jun 14, 2011
-FP-Growth FP means frequent pattern
-the FP-Growth algorithm needs: 
-1. FP-tree (class treeNode)
-2. header table (use dict)
+"""
+FP-Growth 频繁模式增长算法
 
-This finds frequent itemsets similar to apriori but does not 
-find association rules.  
+FP-Growth 是 Apriori 算法的高效替代方案，通过两次数据集扫描构建 FP 树，
+然后在 FP 树上递归挖掘频繁项集，无需像 Apriori 那样生成候选集。
 
-@author: Peter
-'''
+本模块功能：
+- treeNode: FP 树节点类
+- createTree / updateTree / updateHeader: 构建 FP 树
+- ascendTree / findPrefixPath: 查找条件模式基
+- mineTree: 递归挖掘频繁项集
+- loadSimpDat / createInitSet: 示例数据加载与初始化
+"""
 class treeNode:
     def __init__(self, nameValue, numOccur, parentNode):
         self.name = nameValue
@@ -57,7 +58,7 @@ def updateTree(items, inTree, headerTable, count):
         inTree.children[items[0]].inc(count) #incrament count
     else:   #add items[0] to inTree.children
         inTree.children[items[0]] = treeNode(items[0], count, inTree)
-        if headerTable[items[0]][1] == None: #update header table 
+        if headerTable[items[0]][1] is None: #update header table 
             headerTable[items[0]][1] = inTree.children[items[0]]
         else:
             updateHeader(headerTable[items[0]][1], inTree.children[items[0]])
@@ -65,18 +66,18 @@ def updateTree(items, inTree, headerTable, count):
         updateTree(items[1::], inTree.children[items[0]], headerTable, count)
         
 def updateHeader(nodeToTest, targetNode):   #this version does not use recursion
-    while (nodeToTest.nodeLink != None):    #Do not use recursion to traverse a linked list!
+    while (nodeToTest.nodeLink is not None):    #Do not use recursion to traverse a linked list!
         nodeToTest = nodeToTest.nodeLink
     nodeToTest.nodeLink = targetNode
         
 def ascendTree(leafNode, prefixPath): #ascends from leaf node to root
-    if leafNode.parent != None:
+    if leafNode.parent is not None:
         prefixPath.append(leafNode.name)
         ascendTree(leafNode.parent, prefixPath)
     
 def findPrefixPath(basePat, treeNode): #treeNode comes from header table
     condPats = {}
-    while treeNode != None:
+    while treeNode is not None:
         prefixPath = []
         ascendTree(treeNode, prefixPath)
         if len(prefixPath) > 1: 
@@ -96,7 +97,7 @@ def mineTree(inTree, headerTable, minSup, preFix, freqItemList):
         #2. construct cond FP-tree from cond. pattern base
         myCondTree, myHead = createTree(condPattBases, minSup)
         #print 'head from conditional tree: ', myHead
-        if myHead != None: #3. mine cond. FP-tree
+        if myHead is not None: #3. mine cond. FP-tree
             #print 'conditional tree for: ',newFreqSet
             #myCondTree.disp(1)            
             mineTree(myCondTree, myHead, minSup, newFreqSet, freqItemList)
@@ -153,11 +154,22 @@ def createInitSet(dataSet):
 #     mineTree(myFPtree, myHeaderTab, minSup, set([]), myFreqList)
 #     return myFreqList
 
-#minSup = 3
-#simpDat = loadSimpDat()
-#initSet = createInitSet(simpDat)
-#myFPtree, myHeaderTab = createTree(initSet, minSup)
-#myFPtree.disp()
-#myFreqList = []
-#mineTree(myFPtree, myHeaderTab, minSup, set([]), myFreqList)
+
+if __name__ == '__main__':
+    print("==== FP-Growth 频繁项集挖掘演示 ====")
+
+    print("\n--- 使用简单示例数据 ---")
+    simpDat = loadSimpDat()
+    initSet = createInitSet(simpDat)
+    minSup = 3
+    myFPtree, myHeaderTab = createTree(initSet, minSup)
+
+    print("\nFP 树结构:")
+    myFPtree.disp()
+
+    print("\n频繁项集（最小支持度=%d）:" % minSup)
+    freqItems = []
+    mineTree(myFPtree, myHeaderTab, minSup, set([]), freqItems)
+    for item in freqItems:
+        print(item)
 

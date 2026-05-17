@@ -245,6 +245,61 @@ def print_applications():
             print(f"  • {app}")
 
 
+def visualize_distance_metrics():
+    np.random.seed(42)
+    n_points = 6
+    points = np.random.rand(n_points, 2) * 10
+    ref_idx = 0
+    ref_point = points[ref_idx]
+
+    metric_names = ['欧氏距离', '曼哈顿距离', '闵可夫斯基(p=3)', '余弦距离', 'Pearson距离']
+    distances = []
+    for i in range(n_points):
+        if i == ref_idx:
+            distances.append([0] * 5)
+            continue
+        d_euc = euclidean_distance(ref_point, points[i])
+        d_man = manhattan_distance(ref_point, points[i])
+        d_min = minkowski_distance(ref_point, points[i], p=3)
+        d_cos = 1 - cosine_similarity(ref_point, points[i])
+        d_prs = 1 - pearson_correlation(ref_point, points[i])
+        distances.append([d_euc, d_man, d_min, d_cos, d_prs])
+
+    distances = np.array(distances)
+    labels = [f'P{i}' for i in range(n_points)]
+
+    fig, axes = plt.subplots(1, 2, figsize=(14, 5))
+
+    ax1 = axes[0]
+    ax1.scatter(points[:, 0], points[:, 1], c='steelblue', s=100, edgecolors='k', zorder=3)
+    for i, (x, y) in enumerate(points):
+        ax1.annotate(labels[i], (x, y), textcoords="offset points", xytext=(5, 5), fontsize=10)
+    ax1.scatter(ref_point[0], ref_point[1], c='red', s=150, edgecolors='k', marker='*', zorder=4, label='参考点P0')
+    ax1.set_xlabel('X')
+    ax1.set_ylabel('Y')
+    ax1.set_title('2D散点数据')
+    ax1.legend()
+    ax1.grid(True, alpha=0.3)
+
+    ax2 = axes[1]
+    x_pos = np.arange(n_points - 1)
+    width = 0.15
+    colors = ['#e74c3c', '#3498db', '#2ecc71', '#f39c12', '#9b59b6']
+    for j, (metric, color) in enumerate(zip(metric_names, colors)):
+        vals = distances[distances[:, 0] != 0][:, j] if j == 0 else [distances[i][j] for i in range(n_points) if i != ref_idx]
+        ax2.bar(x_pos + j * width, vals, width, label=metric, color=color, alpha=0.85)
+    ax2.set_xlabel('数据点')
+    ax2.set_ylabel('距离/相异度')
+    ax2.set_title('距离度量对比')
+    ax2.set_xticks(x_pos + width * 2)
+    ax2.set_xticklabels([labels[i] for i in range(n_points) if i != ref_idx])
+    ax2.legend(fontsize=8)
+    ax2.grid(True, alpha=0.3, axis='y')
+
+    plt.tight_layout()
+    plt.show()
+
+
 # ============================================================
 # 主函数
 # ============================================================
@@ -258,3 +313,5 @@ if __name__ == '__main__':
     demo_distance_metrics()
     print()
     print_applications()
+    print()
+    visualize_distance_metrics()

@@ -1,0 +1,12 @@
+- [x] Python 2 语法已修复（trees.py, 朴素贝叶斯算法.py 的 iteritems → items）
+- [x] 缺失 import 已补充（模型评估与调优.py, 特征工程.py 的 pandas 导入）
+- [x] `from numpy import *` 已消除（5个文件改为显式导入）
+- [x] docstring 和 `__main__` 已补充（6个核心文件）
+- [x] 硬编码字体路径已移除（ID3补充实现.py）
+- [x] 重复文件已合并（Apriori补充实现.py 已删除，FP_Growth算法.py 已创建为合并版本，原 fpGrowth.py/FP_Growth.py 用户选择保留）
+- [x] Bagging 手动实现已添加（集成学习.py）
+- [x] AdaBoost 手动实现已添加（集成学习.py）
+- [x] DBSCAN 手动实现已添加（高级聚类.py）
+- [x] 8个模块的可视化已补充
+- [x] 所有修改的文件语法检查通过（py_compile 通过）
+- [x] pytest 测试全部通过（37 passed）

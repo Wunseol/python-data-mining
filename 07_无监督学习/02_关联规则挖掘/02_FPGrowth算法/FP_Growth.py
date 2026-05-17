@@ -116,7 +116,7 @@ def updateTree(items, inTree, headerTable, count):
         # 创建一个新节点
         inTree.children[items[0]] = treeNode(items[0], count, inTree)
         # 若原来不存在该类别，更新头指针列表
-        if headerTable[items[0]][1] == None:
+        if headerTable[items[0]][1] is None:
             # 指向更新
             headerTable[items[0]][1] = inTree.children[items[0]]
         # 更新指向
@@ -141,7 +141,7 @@ Modify:
     2018-08-06
 """
 def updateHeader(nodeToTest, targetNode):
-    while(nodeToTest.nodeLink != None):
+    while(nodeToTest.nodeLink is not None):
         nodeToTest = nodeToTest.nodeLink
     nodeToTest.nodeLink = targetNode
 
@@ -205,7 +205,7 @@ Modify:
 """
 def ascendTree(leafNode, prefixPath):
     # 当前节点的父节点不为空
-    if leafNode.parent != None:
+    if leafNode.parent is not None:
         # 当前节点添加入前缀列表
         prefixPath.append(leafNode.name)
         # 递归遍历所有前缀路线节点
@@ -227,7 +227,7 @@ Modify:
 """
 def findPrefixPath(basePat, treeNode):
     condPats = {}
-    while treeNode != None:
+    while treeNode is not None:
         prefixPath = []
         # 寻找当前非空节点的前缀
         ascendTree(treeNode, prefixPath)
@@ -273,7 +273,7 @@ def mineTree(inTree, headerTable, minSup, preFix, freqItemList):
         myContTree, myHead = createTree(condPattBases, minSup)
         # print('head from conditional tree: ', myHead)
         # 挖掘条件FP树，直到条件树中没有元素为止
-        if myHead != None:
+        if myHead is not None:
             print('conditional tree for: ', newFreqSet)
             myContTree.disp(1)
             mineTree(myContTree, myHead, minSup, newFreqSet, freqItemList)

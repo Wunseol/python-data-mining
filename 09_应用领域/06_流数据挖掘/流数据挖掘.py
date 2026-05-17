@@ -11,12 +11,17 @@
 参考：ICDM 2025、DaKM 2025专题
 """
 
+import sys
+import os
+
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', '..'))
 import numpy as np
 from collections import deque, defaultdict
 
 import matplotlib.pyplot as plt
-plt.rcParams['font.sans-serif'] = ['SimHei', 'Microsoft YaHei']
-plt.rcParams['axes.unicode_minus'] = False
+from utils import setup_chinese_font
+
+setup_chinese_font()
 
 
 # ============================================================

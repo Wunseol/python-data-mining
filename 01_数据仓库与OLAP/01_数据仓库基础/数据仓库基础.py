@@ -11,13 +11,18 @@
 参考：Han & Kamber《数据挖掘：概念与技术》第4章
 """
 
+import sys
+import os
+
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', '..'))
 import pandas as pd
 import numpy as np
 from collections import defaultdict
 
 import matplotlib.pyplot as plt
-plt.rcParams['font.sans-serif'] = ['SimHei', 'Microsoft YaHei']
-plt.rcParams['axes.unicode_minus'] = False
+from utils import setup_chinese_font
+
+setup_chinese_font()
 
 
 # ============================================================

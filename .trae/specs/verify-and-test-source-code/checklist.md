@@ -1,0 +1,9 @@
+- [x] Python 2/3 兼容性问题已修复（map()、== None、canvas.show()）
+- [x] 资源泄漏已修复（所有 open() 改为 with open()）
+- [x] 通配符导入已消除（from numpy import *、from tkinter import *）
+- [x] 中文字体设置已统一（14个文件改用 setup_chinese_font）
+- [x] 核心文件 docstring 和 __main__ 已补充
+- [x] 单元测试已编写（6个新测试文件，总测试数 119）
+- [x] 所有 77 个源文件 py_compile 通过
+- [x] pytest 全部通过（119 passed）
+- [x] flake8 无严重功能性问题（1523条格式警告，无非功能性问题）

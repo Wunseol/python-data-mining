@@ -9,12 +9,16 @@ Web挖掘模块 - Web Mining
 参考：Han & Kamber 第13.1.2节、DaKM 2025专题
 """
 
+import sys
+import os
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', '..'))
+from utils import setup_chinese_font
+
 import numpy as np
 from collections import defaultdict
 
 import matplotlib.pyplot as plt
-plt.rcParams['font.sans-serif'] = ['SimHei', 'Microsoft YaHei']
-plt.rcParams['axes.unicode_minus'] = False
+setup_chinese_font()
 
 
 # ============================================================
@@ -290,6 +294,41 @@ def web_log_mining():
         print(f"  {page}: {count}次 {bar}")
 
 
+def visualize_pagerank_hits(pr, auth, hub):
+    fig, axes = plt.subplots(1, 2, figsize=(14, 5))
+
+    ax1 = axes[0]
+    nodes = sorted(pr.keys())
+    pr_values = [pr[n] for n in nodes]
+    colors_pr = plt.cm.Blues(np.linspace(0.3, 0.9, len(nodes)))
+    bars = ax1.bar(nodes, pr_values, color=colors_pr, edgecolor='k', alpha=0.85)
+    for bar, val in zip(bars, pr_values):
+        ax1.text(bar.get_x() + bar.get_width() / 2, bar.get_height() + 0.005,
+                 f'{val:.3f}', ha='center', fontsize=9)
+    ax1.set_xlabel('网页节点')
+    ax1.set_ylabel('PageRank值')
+    ax1.set_title('PageRank值分布')
+    ax1.grid(True, alpha=0.3, axis='y')
+
+    ax2 = axes[1]
+    auth_values = [auth[n] for n in nodes]
+    hub_values = [hub[n] for n in nodes]
+    x = np.arange(len(nodes))
+    width = 0.35
+    ax2.bar(x - width / 2, auth_values, width, label='权威值(Authority)', color='#3498db', alpha=0.85)
+    ax2.bar(x + width / 2, hub_values, width, label='中心值(Hub)', color='#e74c3c', alpha=0.85)
+    ax2.set_xlabel('网页节点')
+    ax2.set_ylabel('HITS值')
+    ax2.set_title('HITS权威值/中心值对比')
+    ax2.set_xticks(x)
+    ax2.set_xticklabels(nodes)
+    ax2.legend()
+    ax2.grid(True, alpha=0.3, axis='y')
+
+    plt.tight_layout()
+    plt.show()
+
+
 # ============================================================
 # 主程序
 # ============================================================
@@ -306,11 +345,13 @@ if __name__ == "__main__":
         'D': ['C'],
         'E': ['A', 'C'],
     }
-    pagerank(web_graph)
-    hits_algorithm(web_graph)
+    pr = pagerank(web_graph)
+    auth, hub = hits_algorithm(web_graph)
 
     # Web内容挖掘
     web_content_mining()
 
     # Web日志挖掘
     web_log_mining()
+
+    visualize_pagerank_hits(pr, auth, hub)

@@ -9,6 +9,7 @@
 5. 集成方法对比
 """
 
+import sys
 import os
 import numpy as np
 import matplotlib.pyplot as plt
@@ -26,8 +27,8 @@ from sklearn.model_selection import train_test_split, cross_val_score
 from sklearn.metrics import accuracy_score, classification_report
 from sklearn.preprocessing import StandardScaler
 
-plt.rcParams['font.sans-serif'] = ['SimHei', 'Microsoft YaHei']
-plt.rcParams['axes.unicode_minus'] = False
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
+from utils import setup_chinese_font
 
 _SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 
@@ -222,6 +223,157 @@ def demo_xgboost(X_train, X_test, y_train, y_test):
 
 
 # ============================================================
+# 7. Bagging 手动实现
+# ============================================================
+class BaggingManual:
+    """Bagging（装袋法）手动实现
+
+    核心思想：
+    1. 对训练集进行有放回抽样（Bootstrap），生成多个子训练集
+    2. 在每个子训练集上训练一个基学习器（决策树桩）
+    3. 对所有基学习器的预测结果进行多数投票
+    """
+
+    def __init__(self, n_estimators=10, max_samples=1.0, random_state=42):
+        self.n_estimators = n_estimators
+        self.max_samples = max_samples
+        self.random_state = random_state
+        self.estimators_ = []
+
+    def fit(self, X, y):
+        """使用 Bootstrap 采样训练多个基学习器
+
+        参数:
+            X: 训练特征, shape=(n_samples, n_features)
+            y: 训练标签, shape=(n_samples,)
+        """
+        rng = np.random.RandomState(self.random_state)
+        n_samples = X.shape[0]
+        # 每个子训练集的样本数
+        sub_sample_size = int(n_samples * self.max_samples)
+
+        self.estimators_ = []
+        for i in range(self.n_estimators):
+            # Bootstrap 有放回抽样：从 n_samples 中抽取 sub_sample_size 个样本
+            indices = rng.choice(n_samples, size=sub_sample_size, replace=True)
+            X_sub, y_sub = X[indices], y[indices]
+
+            # 训练决策树桩作为基学习器（max_depth=1）
+            stump = DecisionTreeClassifier(max_depth=1, random_state=rng.randint(0, 2**31))
+            stump.fit(X_sub, y_sub)
+            self.estimators_.append(stump)
+
+        return self
+
+    def predict(self, X):
+        """多数投票预测
+
+        对每个样本，统计所有基学习器的预测结果，取出现次数最多的类别
+        """
+        # 收集所有基学习器的预测: shape=(n_estimators, n_samples)
+        predictions = np.array([est.predict(X) for est in self.estimators_])
+        # 对每列（每个样本）取众数
+        result = np.array([
+            np.bincount(predictions[:, i].astype(int)).argmax()
+            for i in range(X.shape[0])
+        ])
+        return result
+
+
+# ============================================================
+# 8. AdaBoost 手动实现
+# ============================================================
+class AdaBoostManual:
+    """AdaBoost（自适应提升）手动实现
+
+    核心思想：
+    1. 初始化每个样本的权重为 1/N
+    2. 每轮训练一个弱学习器（决策树桩）
+    3. 根据弱学习器的加权错误率计算该学习器的权重 α
+    4. 增大被错误分类样本的权重，减小被正确分类样本的权重
+    5. 最终通过加权投票进行预测
+
+    α = learning_rate * ln((1 - err) / err)
+    权重更新: w_i *= exp(α * I(y_i ≠ h(x_i)))
+    """
+
+    def __init__(self, n_estimators=50, learning_rate=1.0, random_state=42):
+        self.n_estimators = n_estimators
+        self.learning_rate = learning_rate
+        self.random_state = random_state
+        self.estimators_ = []
+        self.estimator_weights_ = []
+
+    def fit(self, X, y):
+        """训练 AdaBoost 集成模型
+
+        参数:
+            X: 训练特征, shape=(n_samples, n_features)
+            y: 训练标签, shape=(n_samples,)，需为 {0, 1} 二分类
+        """
+        rng = np.random.RandomState(self.random_state)
+        n_samples = X.shape[0]
+
+        # 步骤1: 初始化样本权重，每个样本权重相等
+        sample_weights = np.ones(n_samples) / n_samples
+
+        self.estimators_ = []
+        self.estimator_weights_ = []
+
+        for t in range(self.n_estimators):
+            # 步骤2: 根据当前样本权重训练弱学习器（决策树桩）
+            stump = DecisionTreeClassifier(max_depth=1, random_state=rng.randint(0, 2**31))
+            stump.fit(X, y, sample_weight=sample_weights)
+
+            # 步骤3: 计算加权错误率
+            y_pred = stump.predict(X)
+            incorrect = (y_pred != y)
+            err = np.dot(sample_weights, incorrect)
+
+            # 如果错误率 >= 0.5，说明该弱学习器比随机猜测还差，提前终止
+            if err >= 0.5:
+                break
+
+            # 避免除零：err 过小时截断
+            err = max(err, 1e-10)
+
+            # 步骤4: 计算弱学习器权重 α
+            # α 越大表示该弱学习器越重要
+            alpha = self.learning_rate * np.log((1.0 - err) / err)
+
+            # 步骤5: 更新样本权重
+            # 被错误分类的样本权重增大，被正确分类的样本权重减小
+            sample_weights *= np.exp(alpha * incorrect)
+
+            # 归一化样本权重，使其总和为1
+            sample_weights /= sample_weights.sum()
+
+            self.estimators_.append(stump)
+            self.estimator_weights_.append(alpha)
+
+        self.estimator_weights_ = np.array(self.estimator_weights_)
+        return self
+
+    def predict(self, X):
+        """加权投票预测
+
+        每个弱学习器的预测乘以其权重 α，求和后取符号
+        """
+        # 每个弱学习器的预测: shape=(n_estimators, n_samples)
+        predictions = np.array([est.predict(X) for est in self.estimators_])
+
+        # 将标签 {0, 1} 映射到 {-1, +1} 以便加权求和
+        predictions_signed = 2 * predictions - 1
+
+        # 加权求和: shape=(n_samples,)
+        weighted_sum = np.dot(self.estimator_weights_, predictions_signed)
+
+        # 取符号，再映射回 {0, 1}
+        result = (np.sign(weighted_sum) >= 0).astype(int)
+        return result
+
+
+# ============================================================
 # 主程序演示
 # ============================================================
 if __name__ == '__main__':
@@ -245,3 +397,46 @@ if __name__ == '__main__':
     voting = demo_voting(X_train_s, X_test_s, y_train, y_test)
     stacking = demo_stacking(X_train_s, X_test_s, y_train, y_test)
     xgb = demo_xgboost(X_train_s, X_test_s, y_train, y_test)
+
+    # ============================================================
+    # 手动实现 vs sklearn 对比
+    # ============================================================
+    print("\n" + "=" * 60)
+    print("手动实现 vs sklearn 对比")
+    print("=" * 60)
+
+    # --- Bagging 对比 ---
+    print("\n--- Bagging 手动实现 vs sklearn ---")
+    bag_manual = BaggingManual(n_estimators=10, max_samples=1.0, random_state=42)
+    bag_manual.fit(X_train_s, y_train)
+    y_pred_bag_manual = bag_manual.predict(X_test_s)
+    acc_bag_manual = accuracy_score(y_test, y_pred_bag_manual)
+
+    bag_sklearn = BaggingClassifier(
+        estimator=DecisionTreeClassifier(max_depth=1),
+        n_estimators=10, max_samples=1.0, random_state=42
+    )
+    bag_sklearn.fit(X_train_s, y_train)
+    y_pred_bag_sklearn = bag_sklearn.predict(X_test_s)
+    acc_bag_sklearn = accuracy_score(y_test, y_pred_bag_sklearn)
+
+    print(f"  BaggingManual 准确率:   {acc_bag_manual:.4f}")
+    print(f"  sklearn Bagging 准确率: {acc_bag_sklearn:.4f}")
+
+    # --- AdaBoost 对比 ---
+    print("\n--- AdaBoost 手动实现 vs sklearn ---")
+    ada_manual = AdaBoostManual(n_estimators=50, learning_rate=1.0, random_state=42)
+    ada_manual.fit(X_train_s, y_train)
+    y_pred_ada_manual = ada_manual.predict(X_test_s)
+    acc_ada_manual = accuracy_score(y_test, y_pred_ada_manual)
+
+    ada_sklearn = AdaBoostClassifier(
+        estimator=DecisionTreeClassifier(max_depth=1),
+        n_estimators=50, learning_rate=1.0, random_state=42
+    )
+    ada_sklearn.fit(X_train_s, y_train)
+    y_pred_ada_sklearn = ada_sklearn.predict(X_test_s)
+    acc_ada_sklearn = accuracy_score(y_test, y_pred_ada_sklearn)
+
+    print(f"  AdaBoostManual 准确率:   {acc_ada_manual:.4f}")
+    print(f"  sklearn AdaBoost 准确率: {acc_ada_sklearn:.4f}")

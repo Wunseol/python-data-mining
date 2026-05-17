@@ -5,6 +5,22 @@ Decision Tree Source Code for Machine Learning in Action Ch. 3
 '''
 from math import log
 import operator
+import os
+
+"""
+ID3 决策树算法
+
+ID3 算法以信息增益为分裂准则，递归地选择最优特征构建决策树。
+信息增益 = 原始熵 - 按特征分裂后的条件熵，值越大说明该特征对分类的贡献越大。
+
+本模块功能：
+- calcShannonEnt: 计算数据集的香农熵
+- splitDataSet: 按指定特征值划分数据集
+- chooseBestFeatureToSplit: 选择信息增益最大的特征
+- createTree: 递归构建 ID3 决策树
+- classify: 使用决策树对新样本分类
+- storeTree / grabTree: 决策树的序列化存储与读取
+"""
 
 def createDataSet():
     dataSet = [[1, 1, 'yes'],
@@ -61,7 +77,7 @@ def majorityCnt(classList):
     for vote in classList:
         if vote not in classCount.keys(): classCount[vote] = 0
         classCount[vote] += 1
-    sortedClassCount = sorted(classCount.iteritems(), key=operator.itemgetter(1), reverse=True)
+    sortedClassCount = sorted(classCount.items(), key=operator.itemgetter(1), reverse=True)
     return sortedClassCount[0][0]
 
 def createTree(dataSet,labels):
@@ -94,12 +110,22 @@ def classify(inputTree,featLabels,testVec):
 
 def storeTree(inputTree,filename):
     import pickle
-    fw = open(filename,'w')
-    pickle.dump(inputTree,fw)
-    fw.close()
+    with open(filename,'w') as fw:
+        pickle.dump(inputTree,fw)
     
 def grabTree(filename):
     import pickle
-    fr = open(filename)
-    return pickle.load(fr)
-    
+    with open(filename) as fr:
+        return pickle.load(fr)
+
+
+if __name__ == '__main__':
+    print("==== ID3 决策树算法演示 ====")
+
+    print("\n--- 使用 lenses.txt 隐形眼镜数据构建决策树 ---")
+    with open(os.path.join(os.path.dirname(os.path.abspath(__file__)), 'lenses.txt')) as fr:
+        lenses = [inst.strip().split('\t') for inst in fr.readlines()]
+    lensesLabels = ['age', 'prescript', 'astigmatic', 'tearRate']
+    lensesTree = createTree(lenses, lensesLabels[:])
+    print("决策树结构:")
+    print(lensesTree)

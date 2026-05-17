@@ -1,5 +1,5 @@
 import numpy as np
-from tkinter import *
+from tkinter import Tk, Label, Entry, Button, IntVar, Checkbutton, END
 import regTrees
 
 import matplotlib
@@ -28,7 +28,7 @@ def reDraw(tolS, tolN):
     reDraw.a.scatter(clean_dat[:, 0], clean_dat[:, 1], s=5)
 
     reDraw.a.plot(reDraw.testDat, yHat, linewidth=2.0)
-    reDraw.canvas.show()
+    reDraw.canvas.draw()
 
 
 def getInputs():
@@ -58,7 +58,7 @@ root = Tk()
 
 reDraw.f = Figure(figsize=(5, 4), dpi=100)
 reDraw.canvas = FigureCanvasTkAgg(reDraw.f, master=root)
-reDraw.canvas.show()
+reDraw.canvas.draw()
 reDraw.canvas.get_tk_widget().grid(row=0, columnspan=3)
 
 Label(root, text="tolN").grid(row=1, column=0)

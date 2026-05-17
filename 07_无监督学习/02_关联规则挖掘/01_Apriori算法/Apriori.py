@@ -1,4 +1,15 @@
+"""Apriori关联规则挖掘算法模块
+
+实现Apriori算法进行频繁项集挖掘与关联规则生成，
+包括候选项集产生、支持度计算、置信度评估与规则提取。
+"""
 import os
+import sys
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', '..', '..'))
+from utils import setup_chinese_font
+
+import matplotlib.pyplot as plt
+setup_chinese_font()
 # -*- coding: utf-8 -*-
 """
 Created on Sat Aug  4 21:35:55 2018
@@ -253,19 +264,57 @@ if __name__ == '__main__':
     dataSet = loadDataSet()
     L, supportData = apriori(dataSet, 0.5)
     rules = generateRules(L, supportData, minConf=0.7)
-    mushDataSet = [line.split() for line in open(os.path.join(os.path.dirname(os.path.abspath(__file__)), 'mushroom.dat')).readlines()]
-    L, supportData = apriori(mushDataSet, 0.3)
-    # print(L)
-    # print(rules)
-    for item in L[1]:
-        if item.intersection('2'):
-            print(item)
-    for item in L[3]:
-        if item.intersection('2'):
-            print(item)
 
-    print("Done!")
-    print("20211113492 陈文聪 \n")
+    fig, axes = plt.subplots(1, 2, figsize=(14, 5))
+
+    ax1 = axes[0]
+    item_labels = []
+    item_supports = []
+    for level_idx, level in enumerate(L):
+        for item in level:
+            label = ','.join(str(x) for x in sorted(item))
+            item_labels.append(label)
+            item_supports.append(supportData[item])
+    sorted_pairs = sorted(zip(item_labels, item_supports), key=lambda x: x[1], reverse=True)
+    sorted_labels = [p[0] for p in sorted_pairs]
+    sorted_supports = [p[1] for p in sorted_pairs]
+    colors = plt.cm.viridis(np.linspace(0.2, 0.8, len(sorted_labels)))
+    bars = ax1.barh(range(len(sorted_labels)), sorted_supports, color=colors, alpha=0.85)
+    ax1.set_yticks(range(len(sorted_labels)))
+    ax1.set_yticklabels(sorted_labels)
+    ax1.set_xlabel('支持度')
+    ax1.set_title('频繁项集支持度')
+    ax1.invert_yaxis()
+    ax1.grid(True, alpha=0.3, axis='x')
+
+    ax2 = axes[1]
+    if rules:
+        confidences = [rule[2] for rule in rules]
+        lifts = []
+        for rule in rules:
+            antecedent = rule[0]
+            consequent = rule[1]
+            conf = rule[2]
+            support_consequent = supportData[consequent]
+            lift = conf / support_consequent if support_consequent > 0 else 0
+            lifts.append(lift)
+        rule_labels = [f"{rule[0]}→{rule[1]}" for rule in rules]
+        scatter = ax2.scatter(lifts, confidences, c='#e74c3c', s=100, edgecolors='k', zorder=3)
+        for i, label in enumerate(rule_labels):
+            ax2.annotate(label, (lifts[i], confidences[i]), textcoords="offset points",
+                         xytext=(5, 5), fontsize=8)
+        ax2.set_xlabel('提升度')
+        ax2.set_ylabel('置信度')
+        ax2.set_title('关联规则：置信度 vs 提升度')
+        ax2.axhline(y=0.7, color='gray', linestyle='--', alpha=0.5, label='最小置信度=0.7')
+        ax2.legend()
+    else:
+        ax2.text(0.5, 0.5, '无满足条件的关联规则', ha='center', va='center', fontsize=14)
+        ax2.set_title('关联规则：置信度 vs 提升度')
+    ax2.grid(True, alpha=0.3)
+
+    plt.tight_layout()
+    plt.show()
 
 
 

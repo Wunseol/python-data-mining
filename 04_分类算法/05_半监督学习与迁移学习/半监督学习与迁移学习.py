@@ -11,6 +11,10 @@
 参考：Han & Kamber《数据挖掘：概念与技术》第9.7节
 """
 
+import sys
+import os
+
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', '..'))
 import numpy as np
 from sklearn.datasets import make_moons, make_classification
 from sklearn.model_selection import train_test_split
@@ -18,8 +22,9 @@ from sklearn.svm import SVC
 from sklearn.metrics import accuracy_score
 
 import matplotlib.pyplot as plt
-plt.rcParams['font.sans-serif'] = ['SimHei', 'Microsoft YaHei']
-plt.rcParams['axes.unicode_minus'] = False
+from utils import setup_chinese_font
+
+setup_chinese_font()
 
 
 # ============================================================

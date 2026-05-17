@@ -9,12 +9,16 @@
 5. 链接预测
 """
 
+import sys
+import os
+
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', '..'))
 import numpy as np
 import matplotlib.pyplot as plt
 from collections import defaultdict, deque
+from utils import setup_chinese_font
 
-plt.rcParams['font.sans-serif'] = ['SimHei', 'Microsoft YaHei']
-plt.rcParams['axes.unicode_minus'] = False
+setup_chinese_font()
 
 
 # ============================================================

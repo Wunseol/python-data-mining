@@ -8,8 +8,8 @@ import treePlotter
 
 _SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 
-fr = open(os.path.join(_SCRIPT_DIR, "lenses.txt"))
-lenses = [inst.strip().split('\t') for inst in fr.readlines()]
+with open(os.path.join(_SCRIPT_DIR, "lenses.txt")) as fr:
+    lenses = [inst.strip().split('\t') for inst in fr.readlines()]
 lensesLabels = ['age', 'prescript', 'astigmatic', 'tearrate']
 lensesTree = trees.createTree(lenses, lensesLabels)
 print(lensesTree)

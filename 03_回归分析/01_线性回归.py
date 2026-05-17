@@ -9,6 +9,10 @@
 5. 回归诊断与评估
 """
 
+import sys
+import os
+
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), '..'))
 import numpy as np
 import matplotlib.pyplot as plt
 from sklearn.datasets import make_regression, load_diabetes
@@ -16,10 +20,9 @@ from sklearn.linear_model import LinearRegression, Ridge, Lasso, ElasticNet
 from sklearn.model_selection import train_test_split, cross_val_score
 from sklearn.metrics import mean_squared_error, r2_score, mean_absolute_error
 from sklearn.preprocessing import StandardScaler
+from utils import setup_chinese_font
 
-# 设置中文显示
-plt.rcParams['font.sans-serif'] = ['SimHei', 'Microsoft YaHei']
-plt.rcParams['axes.unicode_minus'] = False
+setup_chinese_font()
 
 
 # ============================================================

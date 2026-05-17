@@ -9,12 +9,16 @@
 5. 冷启动问题与混合策略
 """
 
+import sys
+import os
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', '..'))
+from utils import setup_chinese_font
+
 import numpy as np
 import matplotlib.pyplot as plt
 from collections import defaultdict
 
-plt.rcParams['font.sans-serif'] = ['SimHei', 'Microsoft YaHei']
-plt.rcParams['axes.unicode_minus'] = False
+setup_chinese_font()
 
 
 # ============================================================
@@ -290,3 +294,56 @@ if __name__ == '__main__':
     demo_svd_recommend()
     demo_evaluation()
     print_cold_start_strategies()
+
+    R = create_rating_matrix()
+    np.random.seed(42)
+    mask = R != 0
+    user_based_preds = np.zeros_like(R, dtype=float)
+    item_based_preds = np.zeros_like(R, dtype=float)
+
+    for u in range(R.shape[0]):
+        for i in range(R.shape[1]):
+            if not mask[u, i]:
+                user_based_preds[u, i] = user_based_predict(R, u, i, k=3)
+                item_based_preds[u, i] = item_based_predict(R, u, i, k=3)
+
+    ub_errors = []
+    ib_errors = []
+    ub_abs_errors = []
+    ib_abs_errors = []
+    for u in range(R.shape[0]):
+        for i in range(R.shape[1]):
+            if mask[u, i]:
+                ub_pred = user_based_predict(R, u, i, k=3)
+                ib_pred = item_based_predict(R, u, i, k=3)
+                ub_errors.append((ub_pred - R[u, i]) ** 2)
+                ib_errors.append((ib_pred - R[u, i]) ** 2)
+                ub_abs_errors.append(abs(ub_pred - R[u, i]))
+                ib_abs_errors.append(abs(ib_pred - R[u, i]))
+
+    ub_rmse = np.sqrt(np.mean(ub_errors)) if ub_errors else 0
+    ib_rmse = np.sqrt(np.mean(ib_errors)) if ib_errors else 0
+    ub_mae = np.mean(ub_abs_errors) if ub_abs_errors else 0
+    ib_mae = np.mean(ib_abs_errors) if ib_abs_errors else 0
+
+    fig, ax = plt.subplots(figsize=(8, 5))
+    methods = ['User-CF', 'Item-CF']
+    x = np.arange(len(methods))
+    width = 0.3
+    bars1 = ax.bar(x - width / 2, [ub_rmse, ib_rmse], width, label='RMSE', color='#3498db', alpha=0.85)
+    bars2 = ax.bar(x + width / 2, [ub_mae, ib_mae], width, label='MAE', color='#e74c3c', alpha=0.85)
+    for bar in bars1:
+        ax.text(bar.get_x() + bar.get_width() / 2, bar.get_height() + 0.02,
+                f'{bar.get_height():.3f}', ha='center', fontsize=10)
+    for bar in bars2:
+        ax.text(bar.get_x() + bar.get_width() / 2, bar.get_height() + 0.02,
+                f'{bar.get_height():.3f}', ha='center', fontsize=10)
+    ax.set_xlabel('推荐方法')
+    ax.set_ylabel('误差')
+    ax.set_title('User-CF 与 Item-CF 推荐效果对比')
+    ax.set_xticks(x)
+    ax.set_xticklabels(methods)
+    ax.legend()
+    ax.grid(True, alpha=0.3, axis='y')
+    plt.tight_layout()
+    plt.show()

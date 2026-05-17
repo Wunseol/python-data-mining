@@ -9,6 +9,10 @@
 5. 基于重构误差的异常检测 (PCA)
 """
 
+import sys
+import os
+
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', '..'))
 import numpy as np
 import matplotlib.pyplot as plt
 from sklearn.datasets import make_blobs, load_wine
@@ -18,9 +22,9 @@ from sklearn.svm import OneClassSVM
 from sklearn.decomposition import PCA
 from sklearn.preprocessing import StandardScaler
 from sklearn.metrics import classification_report, confusion_matrix
+from utils import setup_chinese_font
 
-plt.rcParams['font.sans-serif'] = ['SimHei', 'Microsoft YaHei']
-plt.rcParams['axes.unicode_minus'] = False
+setup_chinese_font()
 
 
 # ============================================================

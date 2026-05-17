@@ -1,3 +1,8 @@
+"""PCA主成分分析模块
+
+实现主成分分析（PCA）进行特征降维，包括协方差矩阵计算、
+特征值分解与数据投影，并提供基于sklearn的合成数据演示。
+"""
 import os
 # -*- coding: utf-8 -*-
 """
@@ -22,8 +27,8 @@ Modify:
     2018-08-07
 """
 def loadDataSet(filename, delim='\t'):
-    fr = open(filename)
-    stringArr = [line.strip().split(delim) for line in fr.readlines()]
+    with open(filename) as fr:
+        stringArr = [line.strip().split(delim) for line in fr.readlines()]
     datArr = [list(map(float, line)) for line in stringArr]
     return np.mat(datArr)
 
@@ -100,24 +105,55 @@ def replaceNaNWithMean():
 
 
 if __name__ == '__main__':
-    dataMat = replaceNaNWithMean()
-    # lowDmat, reconMat = pca(dataMat, topNfeat=20)
-    fig = plt.figure()
-    ax = fig.add_subplot(111)
-    # ax.scatter(reconMat[:, 0].flatten().A[0], reconMat[:, 1].flatten().A[0], marker='o', s=90, c='red')
-    meanVals = np.mean(dataMat, axis=0)
-    meanRemoved = dataMat - meanVals
-    covMat = np.cov(meanRemoved, rowvar=0)
-    eigVals, eigVects = np.linalg.eig(np.mat(covMat))
-    # 特征数
-    i = 6
-    ax.scatter(range(i), eigVals[:i], marker='^', s=50, c='red')
-    ax.plot(range(i), eigVals[:i])
-    lowDmat, reconMat = pca(dataMat, topNfeat=i)
-    # 提取的6个特征
-    print(lowDmat)
-    print("Done!")
-    print("20211113492 陈文聪 \n")
+    from sklearn.decomposition import PCA as SklearnPCA
+    from sklearn.datasets import make_classification
+    from sklearn.preprocessing import StandardScaler
+
+    print("==== PCA主成分分析演示 ====")
+
+    np.random.seed(42)
+    X, y = make_classification(n_samples=200, n_features=10, n_informative=5,
+                               n_redundant=2, random_state=42)
+    scaler = StandardScaler()
+    X_scaled = scaler.fit_transform(X)
+
+    print("\n--- 自实现PCA ---")
+    lowDmat, reconMat = pca(np.mat(X_scaled), topNfeat=3)
+    print("降维后数据形状:", lowDmat.shape)
+
+    print("\n--- sklearn PCA 对比 ---")
+    sk_pca = SklearnPCA(n_components=3, random_state=42)
+    X_pca = sk_pca.fit_transform(X_scaled)
+    print("sklearn PCA 降维后形状:", X_pca.shape)
+    print("各主成分方差解释比:", sk_pca.explained_variance_ratio_)
+
+    fig, axes = plt.subplots(1, 2, figsize=(14, 5))
+
+    ax1 = axes[0]
+    sk_pca_2d = SklearnPCA(n_components=2, random_state=42)
+    X_2d = sk_pca_2d.fit_transform(X_scaled)
+    ax1.scatter(X_2d[y == 0, 0], X_2d[y == 0, 1], c='#3498db', alpha=0.6, label='类别0')
+    ax1.scatter(X_2d[y == 1, 0], X_2d[y == 1, 1], c='#e74c3c', alpha=0.6, label='类别1')
+    ax1.set_xlabel('主成分1')
+    ax1.set_ylabel('主成分2')
+    ax1.set_title('PCA降维可视化（2D）')
+    ax1.legend()
+    ax1.grid(True, alpha=0.3)
+
+    ax2 = axes[1]
+    sk_pca_full = SklearnPCA(random_state=42)
+    sk_pca_full.fit(X_scaled)
+    cumsum = np.cumsum(sk_pca_full.explained_variance_ratio_)
+    ax2.plot(range(1, len(cumsum) + 1), cumsum, 'bo-')
+    ax2.axhline(y=0.9, color='r', linestyle='--', alpha=0.7, label='90%方差')
+    ax2.set_xlabel('主成分数量')
+    ax2.set_ylabel('累计方差解释比')
+    ax2.set_title('PCA累计方差解释比')
+    ax2.legend()
+    ax2.grid(True, alpha=0.3)
+
+    plt.tight_layout()
+    plt.show()
 
 
 

@@ -1,6 +1,25 @@
+"""C4.5决策树算法模块
+
+基于信息增益率（Gain Ratio）替代信息增益作为分裂准则，
+支持离散特征与连续特征的二分处理，克服ID3偏向多值特征的问题。
+"""
 from math import log, sqrt
 import operator
 import re
+
+"""
+C4.5 决策树算法
+
+C4.5 是 ID3 的改进版本，使用信息增益率（Gain Ratio）替代信息增益作为分裂准则，
+克服了 ID3 偏向选择取值较多特征的问题。信息增益率 = 信息增益 / 固有信息值（Split Information）。
+C4.5 还支持连续特征的二分处理。
+
+本模块功能：
+- calcShannonEntropy: 计算数据集的香农熵
+- chooseBestFeat: 选择信息增益率最大的特征（支持离散和连续特征）
+- splitDataSet / splitContinuousDataSet: 离散/连续特征的数据集划分
+- createTree: 递归构建 C4.5 决策树
+"""
 
 
 def createDataSet():

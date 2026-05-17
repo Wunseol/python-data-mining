@@ -1,4 +1,12 @@
-from matplotlib.font_manager import FontProperties
+"""ID3决策树补充实现模块
+
+基于信息增益（Information Gain）作为分裂准则，递归构建ID3决策树，
+包含香农熵计算、数据集划分、决策树构建与可视化等功能。
+"""
+import sys
+import os
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', '..', '..'))
+from utils import setup_chinese_font
 import matplotlib.pyplot as plt
 from math import log
 import numpy as np
@@ -132,12 +140,10 @@ def createPlot(inTree):
 
 def plotNode(nodeTxt, centerPt, parentPt, nodeType):
     arrow_args = dict(arrowstyle="<-")
-    font = FontProperties(fname=r"C:\Windows\Fonts\simsun.ttc", size=14)
-
     createPlot.axl.annotate(nodeTxt, xy=parentPt, xycoords='axes fraction',
                             xytext=centerPt, textcoords='axes fraction',
                             va='center', ha='center', bbox = nodeType,
-                            arrowprops=arrow_args, fontproperties = font)
+                            arrowprops=arrow_args, fontsize=14)
 
 def plotMidText(cntrPt,parentPt, txtString):
     xMid = (parentPt[0] - cntrPt[0]) / 2.0 + cntrPt[0]
@@ -177,6 +183,7 @@ def classify(inputTree, featLabels, testVec):
     return classLabel
 
 def main():
+    setup_chinese_font()
     print("ID3算法")
     print("学号: 20211113492 姓名：陈文聪")
     print()

@@ -18,16 +18,6 @@ import tkinter as tk
 # 调用CART回归树中的代码
 import CART
 
-
-from numpy import *
-
-from tkinter import * 
-
-import matplotlib
-matplotlib.use('TkAgg')
-from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
-from matplotlib.figure import Figure
-
 """
 函数说明：绘制原始数据的散点图以及拟合数据的曲线图
         
@@ -85,7 +75,7 @@ def getInputs():
     except:
         tolN = 10
         print("enter Integer for tolN")
-        tolNentry.delete(0, END)
+        tolNentry.delete(0, tk.END)
         tolNentry.insert(0, '10')
     # 期望输入为浮点数
     try: 
@@ -93,7 +83,7 @@ def getInputs():
     except:
         tolS = 1.0
         print("enter Float for tolS")
-        tolSentry.delete(0, END)
+        tolSentry.delete(0, tk.END)
         tolSentry.insert(0, '1.0')
     return tolN, tolS
 

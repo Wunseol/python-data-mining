@@ -9,6 +9,10 @@
 5. 集成方法 (EasyEnsemble、BalanceCascade)
 """
 
+import sys
+import os
+
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), '..'))
 import numpy as np
 import matplotlib.pyplot as plt
 from sklearn.datasets import make_classification
@@ -20,9 +24,9 @@ from sklearn.metrics import (
     accuracy_score, precision_score, recall_score, f1_score,
     roc_curve, auc
 )
+from utils import setup_chinese_font
 
-plt.rcParams['font.sans-serif'] = ['SimHei', 'Microsoft YaHei']
-plt.rcParams['axes.unicode_minus'] = False
+setup_chinese_font()
 
 
 # ============================================================

@@ -1,13 +1,39 @@
+"""朴素贝叶斯算法（Naive Bayes）模块
+
+基于贝叶斯定理与特征独立性假设，实现文本分类与垃圾邮件检测，
+包括词表构建、词袋模型、拉普拉斯平滑训练与对数概率分类。
+"""
 import os
 '''
 Created on Oct 19, 2010
 
 @author: Peter
 '''
-from numpy import *
+import sys
+import numpy as np
+
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', '..'))
+from utils import setup_chinese_font
+
+import matplotlib.pyplot as plt
+setup_chinese_font()
 
 # 获取当前脚本所在目录，用于定位数据文件
 _SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
+
+"""
+朴素贝叶斯算法（Naive Bayes）
+
+朴素贝叶斯基于贝叶斯定理，假设特征之间相互独立（"朴素"假设），
+通过计算后验概率 P(类别|特征) 进行分类。
+
+本模块功能：
+- trainNB0: 训练朴素贝叶斯分类器（拉普拉斯平滑 + 对数概率）
+- classifyNB: 对新样本进行分类
+- createVocabList / setOfWords2Vec / bagOfWords2VecMN: 词表构建与向量化
+- spamTestSklearn: 使用内嵌合成数据进行垃圾邮件分类演示（无外部依赖）
+- spamTest: 基于外部邮件文件的垃圾邮件分类测试
+"""
 
 def loadDataSet():
     postingList=[['my', 'dog', 'has', 'flea', 'problems', 'help', 'please'],
@@ -18,7 +44,7 @@ def loadDataSet():
                  ['quit', 'buying', 'worthless', 'dog', 'food', 'stupid']]
     classVec = [0,1,0,1,0,1]    #1 is abusive, 0 not
     return postingList,classVec
-                 
+
 def createVocabList(dataSet):
     vocabSet = set([])  #create empty set
     for document in dataSet:
@@ -36,28 +62,28 @@ def setOfWords2Vec(vocabList, inputSet):
 def trainNB0(trainMatrix,trainCategory):
     numTrainDocs = len(trainMatrix)
     numWords = len(trainMatrix[0])
-    pAbusive = sum(trainCategory)/float(numTrainDocs)
-    p0Num = ones(numWords); p1Num = ones(numWords)      #change to ones() 
+    pAbusive = np.sum(trainCategory)/float(numTrainDocs)
+    p0Num = np.ones(numWords); p1Num = np.ones(numWords)      #change to ones()
     p0Denom = 2.0; p1Denom = 2.0                        #change to 2.0
     for i in range(numTrainDocs):
         if trainCategory[i] == 1:
             p1Num += trainMatrix[i]
-            p1Denom += sum(trainMatrix[i])
+            p1Denom += np.sum(trainMatrix[i])
         else:
             p0Num += trainMatrix[i]
-            p0Denom += sum(trainMatrix[i])
-    p1Vect = log(p1Num/p1Denom)          #change to log()
-    p0Vect = log(p0Num/p0Denom)          #change to log()
+            p0Denom += np.sum(trainMatrix[i])
+    p1Vect = np.log(p1Num/p1Denom)          #change to log()
+    p0Vect = np.log(p0Num/p0Denom)          #change to log()
     return p0Vect,p1Vect,pAbusive
 
 def classifyNB(vec2Classify, p0Vec, p1Vec, pClass1):
-    p1 = sum(vec2Classify * p1Vec) + log(pClass1)    #element-wise mult
-    p0 = sum(vec2Classify * p0Vec) + log(1.0 - pClass1)
+    p1 = np.sum(vec2Classify * p1Vec) + np.log(pClass1)    #element-wise mult
+    p0 = np.sum(vec2Classify * p0Vec) + np.log(1.0 - pClass1)
     if p1 > p0:
         return 1
-    else: 
+    else:
         return 0
-    
+
 def bagOfWords2VecMN(vocabList, inputSet):
     returnVec = [0]*len(vocabList)
     for word in inputSet:
@@ -71,19 +97,19 @@ def testingNB():
     trainMat=[]
     for postinDoc in listOPosts:
         trainMat.append(setOfWords2Vec(myVocabList, postinDoc))
-    p0V,p1V,pAb = trainNB0(array(trainMat),array(listClasses))
+    p0V,p1V,pAb = trainNB0(np.array(trainMat),np.array(listClasses))
     testEntry = ['love', 'my', 'dalmation']
-    thisDoc = array(setOfWords2Vec(myVocabList, testEntry))
+    thisDoc = np.array(setOfWords2Vec(myVocabList, testEntry))
     print (testEntry,'classified as: ',classifyNB(thisDoc,p0V,p1V,pAb))
     testEntry = ['stupid', 'garbage']
-    thisDoc = array(setOfWords2Vec(myVocabList, testEntry))
+    thisDoc = np.array(setOfWords2Vec(myVocabList, testEntry))
     print (testEntry,'classified as: ',classifyNB(thisDoc,p0V,p1V,pAb))
 
 def textParse(bigString):    #input is big string, #output is word list
     import re
     listOfTokens = re.split(r'\W*', bigString)
-    return [tok.lower() for tok in listOfTokens if len(tok) > 2] 
-    
+    return [tok.lower() for tok in listOfTokens if len(tok) > 2]
+
 def spamTest():
     # 注意：此函数依赖外部 email/spam/ 和 email/ham/ 目录下的数据文件，
     # 推荐使用 spamTestSklearn() 替代，该函数使用内嵌合成数据，无需外部文件。
@@ -100,18 +126,18 @@ def spamTest():
     vocabList = createVocabList(docList)#create vocabulary
     trainingSet = list(range(50)); testSet=[]           #create test set
     for i in range(10):
-        randIndex = int(random.uniform(0,len(trainingSet)))
+        randIndex = int(np.random.uniform(0,len(trainingSet)))
         testSet.append(trainingSet[randIndex])
-        del(trainingSet[randIndex])  
+        del(trainingSet[randIndex])
     trainMat=[]; trainClasses = []
     for docIndex in trainingSet:#train the classifier (get probs) trainNB0
         trainMat.append(bagOfWords2VecMN(vocabList, docList[docIndex]))
         trainClasses.append(classList[docIndex])
-    p0V,p1V,pSpam = trainNB0(array(trainMat),array(trainClasses))
+    p0V,p1V,pSpam = trainNB0(np.array(trainMat),np.array(trainClasses))
     errorCount = 0
     for docIndex in testSet:        #classify the remaining items
         wordVector = bagOfWords2VecMN(vocabList, docList[docIndex])
-        if classifyNB(array(wordVector),p0V,p1V,pSpam) != classList[docIndex]:
+        if classifyNB(np.array(wordVector),p0V,p1V,pSpam) != classList[docIndex]:
             errorCount += 1
             print ("classification error",docList[docIndex])
     print ('the error rate is: ',float(errorCount)/len(testSet))
@@ -212,13 +238,13 @@ def spamTestSklearn():
     for docIndex in trainingSet:
         trainMat.append(bagOfWords2VecMN(vocabList, docList[docIndex]))
         trainClasses.append(classList[docIndex])
-    p0V, p1V, pSpam = trainNB0(array(trainMat), array(trainClasses))
+    p0V, p1V, pSpam = trainNB0(np.array(trainMat), np.array(trainClasses))
 
     # ==== 在测试集上评估分类器 ====
     errorCount = 0
     for docIndex in testSet:
         wordVector = bagOfWords2VecMN(vocabList, docList[docIndex])
-        if classifyNB(array(wordVector), p0V, p1V, pSpam) != classList[docIndex]:
+        if classifyNB(np.array(wordVector), p0V, p1V, pSpam) != classList[docIndex]:
             errorCount += 1
             print("classification error", docList[docIndex])
     error_rate = float(errorCount) / len(testSet)
@@ -230,8 +256,8 @@ def calcMostFreq(vocabList,fullText):
     freqDict = {}
     for token in vocabList:
         freqDict[token]=fullText.count(token)
-    sortedFreq = sorted(freqDict.iteritems(), key=operator.itemgetter(1), reverse=True) 
-    return sortedFreq[:30]       
+    sortedFreq = sorted(freqDict.items(), key=operator.itemgetter(1), reverse=True)
+    return sortedFreq[:30]
 
 def localWords(feed1,feed0):
     import feedparser
@@ -252,18 +278,18 @@ def localWords(feed1,feed0):
         if pairW[0] in vocabList: vocabList.remove(pairW[0])
     trainingSet = range(2*minLen); testSet=[]           #create test set
     for i in range(20):
-        randIndex = int(random.uniform(0,len(trainingSet)))
+        randIndex = int(np.random.uniform(0,len(trainingSet)))
         testSet.append(trainingSet[randIndex])
-        del(trainingSet[randIndex])  
+        del(trainingSet[randIndex])
     trainMat=[]; trainClasses = []
     for docIndex in trainingSet:#train the classifier (get probs) trainNB0
         trainMat.append(bagOfWords2VecMN(vocabList, docList[docIndex]))
         trainClasses.append(classList[docIndex])
-    p0V,p1V,pSpam = trainNB0(array(trainMat),array(trainClasses))
+    p0V,p1V,pSpam = trainNB0(np.array(trainMat),np.array(trainClasses))
     errorCount = 0
     for docIndex in testSet:        #classify the remaining items
         wordVector = bagOfWords2VecMN(vocabList, docList[docIndex])
-        if classifyNB(array(wordVector),p0V,p1V,pSpam) != classList[docIndex]:
+        if classifyNB(np.array(wordVector),p0V,p1V,pSpam) != classList[docIndex]:
             errorCount += 1
     print ('the error rate is: ',float(errorCount)/len(testSet))
     return vocabList,p0V,p1V
@@ -285,3 +311,46 @@ def getTopWords(ny,sf):
         print (item[0])
 
 
+if __name__ == '__main__':
+    print("==== 朴素贝叶斯算法演示 ====")
+
+    print("\n--- 使用内嵌合成数据进行垃圾邮件分类 ---")
+    error_rate = spamTestSklearn()
+    print("垃圾邮件分类错误率: %.4f" % error_rate)
+
+    from sklearn.datasets import make_classification
+    from sklearn.model_selection import train_test_split
+    from sklearn.naive_bayes import GaussianNB as SklearnGaussianNB
+
+    np.random.seed(42)
+    X, y = make_classification(n_samples=300, n_features=2, n_redundant=0,
+                               n_informative=2, n_clusters_per_class=1, random_state=42)
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, random_state=42)
+
+    sk_nb = SklearnGaussianNB()
+    sk_nb.fit(X_train, y_train)
+    y_pred = sk_nb.predict(X_test)
+
+    fig, axes = plt.subplots(1, 2, figsize=(14, 5))
+
+    ax1 = axes[0]
+    ax1.scatter(X_train[y_train == 0, 0], X_train[y_train == 0, 1], c='#3498db', label='类别0(训练)', alpha=0.6, edgecolors='k')
+    ax1.scatter(X_train[y_train == 1, 0], X_train[y_train == 1, 1], c='#e74c3c', label='类别1(训练)', alpha=0.6, edgecolors='k')
+    ax1.set_xlabel('特征1')
+    ax1.set_ylabel('特征2')
+    ax1.set_title('朴素贝叶斯 - 训练数据')
+    ax1.legend()
+    ax1.grid(True, alpha=0.3)
+
+    ax2 = axes[1]
+    correct = y_pred == y_test
+    ax2.scatter(X_test[correct, 0], X_test[correct, 1], c='#2ecc71', marker='o', label='分类正确', alpha=0.7, edgecolors='k')
+    ax2.scatter(X_test[~correct, 0], X_test[~correct, 1], c='#e74c3c', marker='x', s=100, label='分类错误', linewidths=2)
+    ax2.set_xlabel('特征1')
+    ax2.set_ylabel('特征2')
+    ax2.set_title('朴素贝叶斯 - 分类结果散点图')
+    ax2.legend()
+    ax2.grid(True, alpha=0.3)
+
+    plt.tight_layout()
+    plt.show()
