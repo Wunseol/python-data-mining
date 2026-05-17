@@ -1,0 +1,10 @@
+- [x] README.md 已重命名（readme.md → README.md）
+- [x] README.md 包含居中标题、徽章、专业布局
+- [x] README.md 所有链接指向实际存在的文件
+- [x] README.md 包含致谢章节（教材、开源项目、贡献者）
+- [x] CONTRIBUTING.md 文档链接已修正为新编号 09-15
+- [x] LICENSE 版权年份已更新为 2024-2026
+- [x] CODE_OF_CONDUCT.md 已创建（Contributor Covenant v2.1 中英双语）
+- [x] requirements.txt 已补充 lightgbm 和 catboost
+- [x] .gitattributes 已移除 LFS 跟踪规则
+- [x] docs/README.md 项目首页链接已更新为 README.md

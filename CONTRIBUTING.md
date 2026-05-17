@@ -24,7 +24,7 @@
    ```bash
    git checkout -b feature/你的特性名称
    ```
-3. 按照编码规范编写代码（参见 [实施与开发文档](./docs/05-实施与开发文档.md)）
+3. 按照编码规范编写代码（参见 [实施与开发文档](./docs/13-实施与开发文档.md)）
 4. 确保代码可独立运行：`python <你的模块>.py`
 5. 提交代码，遵循提交信息规范：
    ```
@@ -111,7 +111,7 @@ if __name__ == '__main__':
 | 注释语言 | 中文 |
 | 函数文档 | 三引号 docstring，中文说明 |
 | 分节标记 | `# ====...====` 分隔各功能节 |
-| 中文显示 | `plt.rcParams['font.sans-serif'] = ['SimHei']` |
+| 中文显示 | `from utils import setup_chinese_font` + `setup_chinese_font()` |
 | 随机种子 | `random_state=42` 或 `np.random.seed(42)` |
 | 模块独立性 | 每个模块可独立 `python xxx.py` 运行，无跨模块硬编码依赖 |
 
@@ -126,7 +126,7 @@ flowchart LR
     A["1. 确定所属顶级方向"] --> B["2. 创建子目录"]
     B --> C["3. 编写.py文件"]
     C --> D["4. 本地验证运行"]
-    D --> E["5. 更新readme.md"]
+    D --> E["5. 更新README.md"]
     E --> F["6. 更新docs文档"]
 ```
 
@@ -137,9 +137,9 @@ flowchart LR
 3. 编写文件 → `04_分类算法/06_XGBoost/XGBoost分类.py`
 4. 运行验证 → `python "04_分类算法/06_XGBoost/XGBoost分类.py"`
 5. 更新文档：
-   - [readme.md](./readme.md) — 添加到对应阶段详解
-   - [02-需求规格说明书.md](./docs/02-需求规格说明书.md) — 添加功能需求条目
-   - [05-实施与开发文档.md](./docs/05-实施与开发文档.md) — 添加源码导读条目
+   - [README.md](./README.md) — 添加到对应阶段详解
+   - [10-需求规格说明书.md](./docs/10-需求规格说明书.md) — 添加功能需求条目
+   - [13-实施与开发文档.md](./docs/13-实施与开发文档.md) — 添加源码导读条目
 
 ---
 
@@ -153,10 +153,10 @@ flowchart LR
 - [ ] 关键步骤有行内注释
 - [ ] 遵循 PEP 8 代码风格
 - [ ] 使用 `# ====...====` 分节标记
-- [ ] 中文图表可正确显示（SimHei 字体设置）
+- [ ] 中文图表可正确显示（`setup_chinese_font()` 设置）
 - [ ] 随机种子固定（`random_state=42`）
 - [ ] 无外部数据依赖（使用 sklearn 内置数据集或合成数据）
-- [ ] readme.md 和相关文档已同步更新
+- [ ] README.md 和相关文档已同步更新
 
 ---
 

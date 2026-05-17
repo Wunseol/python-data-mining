@@ -10,6 +10,10 @@ matplotlib>=3.4
 scikit-learn>=1.0
 scipy>=1.7
 
+# ---- 梯度提升 [可选] ----
+lightgbm>=3.0
+catboost>=1.0
+
 # ---- 深度学习 [可选] ----
 # 需要 Python 3.8-3.11，3.12+ 需要 tensorflow>=2.16
 tensorflow>=2.6
